@@ -35,13 +35,6 @@ function vote(email, choice) {
         vote: savedVote
       });
     });
-  // .then(({ user }) => {
-  //   return Promise.resolve({
-  //     success: true,
-  //     message: "User has been created",
-  //     user
-  //   });
-  // });
 }
 
 module.exports = {
