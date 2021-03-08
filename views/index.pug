@@ -1,0 +1,26 @@
+html
+  head
+    title="PTL"
+    link(rel="stylesheet" href="/index.css")
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible" content="ie=edge")
+  body
+    main
+      div
+        button.luna
+          img.im(src="/luna.jpg")
+        button
+          img.im(src="/sonce.jpg")
+      h1 Голосування за ПТЛ!
+      form(action="#" method="GET")
+        div.fields
+          label введіть свою шкільну пошту
+            input(placeholder="youremail@tl-kpi.kiev.ua" id="email" type="email")
+        div.buttons
+          button(id="ok" type="submit" class="btn") За
+          button(id="notok" type="submit" class="btn") Проти
+      div.percent
+        div(style=`width: ${okResult}%` id="ok-result") #{okResult}%
+        div(style=`width: ${notOkResult}%` id="notok-result") #{notOkResult}%
+    script(src="/index.js")
