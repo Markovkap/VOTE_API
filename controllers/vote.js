@@ -2,21 +2,17 @@ const crypto = require("crypto");
 const Vote = require("../models/Vote");
 
 function vote(email, choice) {
-  if (!email || !choice) {
-    return Promise.reject({
-      success: false,
-      message: "Будь ласка заповніть свою електрону пошту та зробіть вибір!!!"
-    });
+  if (!email || typeof choice !== "number") {
+    return createPromiceReject(
+      "Будь ласка заповніть свою електрону пошту та зробіть вибір!!!"
+    );
   }
 
   return Vote.findOne({ email })
     .exec()
     .then((vote) => {
       if (vote) {
-        return Promise.reject({
-          success: false,
-          message: "Ви вже зробили свій вибір!"
-        });
+        return createPromiceReject("Ви вже зробили свій вибір!");
       }
 
       const newVote = new Vote({
@@ -31,10 +27,43 @@ function vote(email, choice) {
       return Promise.resolve({
         success: true,
         message:
-          "Ваш голос збережений, для того, щоб він враховувався потрібно перейти за посиланням на пошті",
-        vote: savedVote
+          "Ваш голос збережений, для того, щоб він враховувався потрібно перейти за посиланням на пошті"
       });
     });
+}
+
+function verifyVote(hash) {
+  if (!/[0-9a-f]{128}/.test(hash)) {
+    return createPromiceReject("Пішов звідси розбійник");
+  }
+
+  return Vote.findOne({ hash })
+    .exec()
+    .then((vote) => {
+      if (!vote) {
+        return createPromiceReject("Пішов звідси довбень");
+      }
+
+      if (vote.verified) {
+        return createPromiceReject("Ваш голос вже зарахований");
+      }
+
+      vote.verified = true;
+      return vote.save();
+    })
+    .then(() => {
+      return Promise.resolve({
+        success: true,
+        message: "Ваш голос зараховано"
+      });
+    });
+}
+
+function createPromiceReject(message) {
+  return Promise.reject({
+    success: false,
+    message
+  });
 }
 
 module.exports = {
