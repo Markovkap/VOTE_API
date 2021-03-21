@@ -1,37 +1,20 @@
 const { Router } = require("express");
-const voteConroller = require("../controllers/vote");
+const voteController = require("../controllers/vote");
+const voteRouter = require("./vote");
 
 const router = new Router();
-const indexRouter = new Router();
 
-router.use("/", indexRouter);
+router.use("/vote", voteRouter);
 
-indexRouter.get("/", (req, res) => {
-  res.render("index", { okResult: 95, notOkResult: 5 });
-  // res.send("INDEX PAGE NOT IMPLEMENTED");
-});
-
-indexRouter.post("/vote", (req, res) => {
-  const { email, choice } = req.body;
-
-  voteConroller
-    .vote(email, choice)
+router.get("/", (req, res) => {
+  voteController
+    .getAllVotes()
     .then((result) => {
-      res.json({
-        success: result.success,
-        message: result.message,
-        exists: result.exists,
-        vote: result.vote
-      });
+      res.render("index", result.voteData);
     })
     .catch((error) => {
-      res.json({
-        success: false,
-        message: error.message
-      });
+      res.status(404).send(error.message);
     });
-
-  // res.send("VOTE API NOT IMPLEMENTED");
 });
 
 module.exports = router;

@@ -1,32 +1,48 @@
 const { Router } = require("express");
-const voteConroller = require("../controllers/vote");
+const voteController = require("../controllers/vote");
 
-const api = new Router();
-const voteApi = new Router();
+const voteRouter = new Router();
 
-api.use("/", voteApi);
+voteRouter.post("/", (req, res) => {
+  const { email, choice } = req.body;
 
-// voteApi.post("/vote", (req, res) => {
-//   // const { email, choice } = req.body;
+  voteController
+    .vote(email, choice, req.headers.host)
+    .then((result) => {
+      res.json({
+        success: result.success,
+        message: result.message,
+        exists: result.exists,
+        vote: result.vote
+      });
+    })
+    .catch((error) => {
+      if (error.errors) {
+        if (error.errors.choice) {
+          error = error.errors.choice;
+        }
 
-//   // voteConroller
-//   //   .vote(email, choice)
-//   //   .then((result) => {
-//   //     res.json({
-//   //       success: result.success,
-//   //       message: result.message,
-//   //       exists: result.exists,
-//   //       vote: result.vote
-//   //     });
-//   //   })
-//   //   .catch((error) => {
-//   //     res.json({
-//   //       success: false,
-//   //       message: error.message
-//   //     });
-//   //   });
+        if (error.errors.email) {
+          error = error.errors.email;
+        }
+      }
 
-//   res.send("VOTE API NOT IMPLEMENTED");
-// });
+      res.json({
+        success: false,
+        message: error.message
+      });
+    });
+});
 
-module.exports = api;
+voteRouter.get("/verify/:hash", (req, res) => {
+  voteController
+    .verifyVote(req.params.hash)
+    .then((result) => {
+      res.render("index", result.voteData);
+    })
+    .catch((error) => {
+      res.status(404).send(error.message);
+    });
+});
+
+module.exports = voteRouter;

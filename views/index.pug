@@ -13,14 +13,18 @@ html
         button
           img.im(src="/sonce.jpg")
       h1 Голосування за ПТЛ!
-      form(action="#" method="GET")
-        div.fields
-          label введіть свою шкільну пошту
-            input(placeholder="youremail@tl-kpi.kiev.ua" id="email" type="email")
-        div.buttons
-          button(id="ok" type="submit" class="btn") За
-          button(id="notok" type="submit" class="btn") Проти
+
+      if message
+        h3 #{message}
+      else
+        form#vote(action="/vote" method="POST")
+          div.fields
+            label введіть свою шкільну пошту
+              input#email(placeholder="youremail@tl-kpi.kiev.ua" type="email" required)
+          div.buttons
+            button#ok(type="submit" class="btn") За
+            button#notok(type="submit" class="btn") Проти
       div.percent
-        div(style=`width: ${okResult}%` id="ok-result") #{okResult}%
-        div(style=`width: ${notOkResult}%` id="notok-result") #{notOkResult}%
+        div#ok-result(style=`width: ${okResult}%`) #{okResult}%
+        div#notok-result(style=`width: ${notOkResult}%`) #{notOkResult}%
     script(src="/index.js")
